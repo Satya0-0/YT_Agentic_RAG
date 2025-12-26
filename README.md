@@ -4,11 +4,10 @@ An end-to-end Retrieval-Augmented Generation (RAG) system for question-answering
 This system downloads videos, transcribes them using Whisper, and enables query-based retrieval with adaptive fallback mechanisms like Query Re-writing, and Web Search.
 
 ## Features
-
-- **Automated Video Download and Trascription**: Downloads YouTube video from provided URL to a specified local location and generates transcriptions using OpenAI's Whisper model (from HuggingFace). Upon creating the transcripts, the video is deleted
-- **VectorDB Based Storaged and Retrieval**: Stores transcriptions in ChromaDB with semantic search capabilities
+- **Automated Video Download and Transcription**: Downloads YouTube video from provided URL to a specified local location and generates transcriptions using OpenAI's Whisper model (from HuggingFace). Upon creating the transcripts, the video is deleted
+- **VectorDB Based Storage and Retrieval**: Stores transcriptions in ChromaDB with semantic search capabilities
 - **Agentic Workflow**: Multi-agent workflow demonstrating agentic decision-making
-- **Query Rewriting**: Query reqriting using another LLM for improved retrieval accuracy
+- **Query Rewriting**: Query rewriting using another LLM for improved retrieval accuracy
 - **LLM-Based Relevance Judgment**: Evaluates retrieved documents' relevance before generating response
 - **Web Search Fallback**: Fall back to web search for information retrieval (even after Query Rewriting)
 - **Conversational Loop**: Supports multi-turn conversations with 'state' persistence
@@ -54,7 +53,7 @@ pip install pydantic
 
 ## Configuration
 
-Set-up your API keys as environment variables (refer ".env .example" for reference):
+Setup your API keys as environment variables (refer ".env .example" for reference):
 
 ```python
 GOOGLE_API_KEY=your_api_key_here
