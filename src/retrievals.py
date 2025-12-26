@@ -1,12 +1,12 @@
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from config import get_config
+from src.config import get_config
 from langchain_core.retrievers import BaseRetriever
 from langchain_core.callbacks import CallbackManagerForRetrieverRun
 from typing import List, Any
 from langchain_chroma import Chroma
 from langchain_core.documents import Document
-from state import *
-from services.nlp_transformers import get_sentence_transformer
+from src.state import *
+from src.services.nlp_transformers import get_sentence_transformer
 
 
 # Global Variable

@@ -2,7 +2,7 @@
 from pathlib import Path
 import os
 
-parent_path = Path(__file__).resolve().parent
+parent_path = Path(__file__).resolve().parent.parent
 video_downloads = parent_path / "video_downloads"
 video_downloads.mkdir(parents=True, exist_ok=True)
 video_path = Path(video_downloads).resolve()

@@ -1,5 +1,5 @@
-from state import *
-from retrievals import global_vector_store
+from src.state import *
+from src.retrievals import global_vector_store
 
 # Defining the Routing Functions
 

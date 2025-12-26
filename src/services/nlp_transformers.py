@@ -1,4 +1,4 @@
-from config import get_config
+from src.config import get_config
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from transformers import pipeline
 
@@ -24,6 +24,7 @@ def get_transcriber():
     return _transcribe_object
 
 def get_text_splitter():
+    global _text_splitter_object
     if _text_splitter_object is None:
         _text_splitter_object = pipeline()
     return _text_splitter_object

@@ -1,10 +1,10 @@
 # Necessary Imports
-from state import *
+from src.state import *
 from yt_dlp import YoutubeDL
 import re
 import uuid
 import os
-from  services.nlp_transformers import get_transcriber
+from  src.services.nlp_transformers import get_transcriber
 
 # Node-1: Downloading YouTube Video
 
