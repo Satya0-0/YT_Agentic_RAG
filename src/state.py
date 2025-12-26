@@ -1,4 +1,4 @@
-from config import get_config
+from src.config import get_config
 from pydantic import BaseModel
 from typing import List, Optional
 

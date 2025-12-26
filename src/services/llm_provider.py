@@ -1,9 +1,11 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
-from config import get_config
+from src.config import get_config
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+env_path = Path(__file__).resolve().parent.parent.parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 def get_llm():
     return ChatGoogleGenerativeAI(
