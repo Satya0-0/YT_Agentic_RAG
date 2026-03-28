@@ -25,8 +25,8 @@ CONFIG = {
         "timestamps":True
     },
     "text_splitter": {
-        "chunk_size":1000,
-        "overlap":0,
+        "chunk_size":800,
+        "overlap":100,
         "length":len,
         "is_separator_regex":False
     },
