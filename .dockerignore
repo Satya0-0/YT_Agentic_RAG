@@ -1,0 +1,6 @@
+.env
+.venv
+venv/
+Jupyter Notebook/
+.gitignore
+__pycache__/
