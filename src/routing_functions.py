@@ -10,7 +10,8 @@ def vector_db_exists(state: State) -> bool:
     else:
         return False
 
-
+def acceptable_for_demo(state: State) -> bool:
+    return state.proceed_with_demo
 
 def retrieved_docs_relevant(state: State) -> str:
     """Checks if the documents retired are relevant to determine the next course of action.

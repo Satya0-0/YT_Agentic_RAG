@@ -13,7 +13,8 @@ class State(BaseModel):
     user_query: str = None
     youtubeURL: str = None
     local_path: str = get_config("path")
-    video_details: str = ""
+    proceed_with_demo: bool = True
+    video_details: Optional[str] = None
     transcription: str = ""
     vectorDB_flg: bool = False
     rewritten_query: Optional[str] = None
