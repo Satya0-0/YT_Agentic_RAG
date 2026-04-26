@@ -7,7 +7,7 @@ from src.retrievals import node4_vectordb, node5_retriever
 from src.query_optimizations import node6_llm_judge, node7_query_rewriter
 from src.websearch import node8_web_search
 from src.responses import node9_generate_response, node10_get_user_input
-from src.routing_functions import vector_db_exists, retrieved_docs_relevant, graph_exit
+from src.routing_functions import vector_db_exists, retrieved_docs_relevant, graph_exit, acceptable_for_demo
 import sys
 
 def main():
@@ -30,7 +30,7 @@ def main():
     # Adding Edges to the "graph" instance
 
     graph.add_conditional_edges(START, vector_db_exists, {True: "5_Retriever", False: "1_YTVideoDownload"})
-    graph.add_edge("1_YTVideoDownload", "2_Transcription")
+    graph.add_conditional_edges("1_YTVideoDownload", acceptable_for_demo, {True: "2_Transcription", False: END})
     graph.add_edge("2_Transcription", "3_CleanUp")
     graph.add_edge("3_CleanUp", "4_vectorDB")
     graph.add_edge("4_vectorDB", "5_Retriever")
@@ -57,7 +57,8 @@ def main():
         app.update_state(
             config={
                 "configurable": {
-                    "thread_id": thread_id
+                    "thread_id": thread_id,
+                    "recursion_limit": 100
                 }
             },
             values={
