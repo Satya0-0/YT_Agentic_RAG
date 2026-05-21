@@ -5,6 +5,9 @@ import re
 import uuid
 import os
 from  src.services.nlp_transformers import get_transcription
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Node-1: Downloading YouTube Video
 
@@ -18,6 +21,8 @@ def clean_filename(title: str) -> str:
 
 def node1_video_download(state: State) -> dict:
     """ Downloads the YouTube video to the local path with a "clean" title"""
+    
+    logger.info(f"Starting video download for URL: {state.youtubeURL}")
 
     # Generating a unique, and safe temporary filename using 'uuid'
     temp_filename_base = str(uuid.uuid4())
@@ -32,7 +37,7 @@ def node1_video_download(state: State) -> dict:
         duration = info.get("duration")
 
     if duration > 900:  # If video is longer than 15 minutes -> exit the LangGraph Loop
-        print("Error! Video is too long for demo. \nExiting LangGraph Loop!!")
+        logger.error("Error! Video is too long for demo. \nExiting LangGraph Loop!!")
         demo_ok = False
         target_filename = None
     
@@ -56,18 +61,17 @@ def node1_video_download(state: State) -> dict:
 
         with YoutubeDL(yt_opts) as yt:
             yt.download([state.youtubeURL])
-
             
         # Renaming the downloaded file name from "Temporary Name" to "Clean Name"
         final_path = os.path.join(state.local_path, target_filename)
         try:
             os.rename(temp_path, final_path)
         except Exception as e:
-            print(f"Error renaming file from {temp_path} to {final_path}: {e}")
+            logger.error(f"Error renaming file from {temp_path} to {final_path}: {e}")
             demo_ok = False
             target_filename = None
 
-    print("Node-1 Executed!")
+    logger.info("Node-1 Executed! Video Downloaded and Renamed Successfully!")
     return {"video_details": target_filename, "proceed_with_demo": demo_ok}
 
 
@@ -81,7 +85,7 @@ def node2_transcription(state: State) -> dict:
     transcription = get_transcription(audio_path)
     # Final Text to be stored in Vector DB
     transcribed_text = transcription.text
-    print("Node-2 Executed!")
+    logger.info("Node-2 Executed! Video Transcribed Successfully!")
 
     return {"transcription": transcribed_text}
 
@@ -93,7 +97,7 @@ def node3_clean_up(state: State) -> None:
     try:
         target_destination = os.path.join(state.local_path, state.video_details)
         os.remove(target_destination)
-        print("Node_CleanUp Executed. Video Deleted!")
+        logger.info("Node3_CleanUp Executed. Video Deleted!")
     except Exception as e:
-        print(f"Error occurred in file. Path not found: {e}")
+        logger.error(f"Error occurred in file. Path not found: {e}")
     return None

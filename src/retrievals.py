@@ -7,7 +7,9 @@ from langchain_chroma import Chroma
 from langchain_core.documents import Document
 from src.state import *
 from src.services.nlp_transformers import get_sentence_transformer
+import logging
 
+logger = logging.getLogger(__name__)
 
 # Global Variable
 global_vector_store = None
@@ -42,7 +44,7 @@ def node4_vectordb(state: State) -> dict:
 
     global_vector_store = vector_store
 
-    print("Node-4 Executed!")
+    logger.info("Node-4 Executed!")
 
     return {"vectorDB_flg": True}
 
@@ -74,5 +76,5 @@ def node5_retriever(state: State) -> dict:
     docs = retriever.get_relevant_documents(query)
     docs_list = list(doc.page_content for doc in docs)
 
-    print("Node-5 Executed!")
+    logger.info("Node-5 Executed!")
     return {"documents": docs_list}
