@@ -3,10 +3,12 @@ from src.services.llm_provider import get_llm
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 from src.state import *
+import logging
 
 # -----------------
 # Global Variable
-output_parser = StrOutputParser()
+OUTPUT_PARSER = StrOutputParser()
+logger = logging.getLogger(__name__)
 
 
 # Node-6: LLM Judge (determines the relevance of retrieved documents)
@@ -14,7 +16,7 @@ output_parser = StrOutputParser()
 def node6_llm_judge(state: State) -> dict:
     """Acts as an LLM Judge to determine retrieved document relevance"""
     llm_judge = get_llm()
-    global output_parser
+    global OUTPUT_PARSER
 
     judge_sys_message = """You are acting as a Judge for determining the relevance of provided input documents in the context
     and comparing it with the query.
@@ -32,7 +34,7 @@ def node6_llm_judge(state: State) -> dict:
     judge_chain = (
             judge_prompt
             | llm_judge
-            | output_parser
+            | OUTPUT_PARSER
     )
 
     if state.rewritten_flg:
@@ -44,7 +46,7 @@ def node6_llm_judge(state: State) -> dict:
 
     judgement_result = judgement.lower() == "true"
 
-    print("Node-6 Executed!")
+    logger.info("Node-6 Executed!")
 
     return {"retrieval_sync": judgement_result}
 
@@ -55,7 +57,7 @@ def node6_llm_judge(state: State) -> dict:
 def node7_query_rewriter(state: State) -> dict:
     """Rewrites the initial user query using another LLM for better retrievals"""
     llm_query_rewrite = get_llm()
-    global output_parser
+    global OUTPUT_PARSER
 
     rewrite_sys_message = """You are an expert **Query Rewriter** for a sophisticated **Agentic RAG (Retrieval-Augmented Generation) system**. Your sole task is to take a user's initial query and rewrite it into a **highly optimized, self-contained, and comprehensive search query** that will maximize the chances of retrieving relevant documents from a technical knowledge base.
 
@@ -72,10 +74,10 @@ def node7_query_rewriter(state: State) -> dict:
         ("human", "{user_input}")
     ])
 
-    rewrite_chain = (rewrite_prompt | llm_query_rewrite | output_parser)
+    rewrite_chain = (rewrite_prompt | llm_query_rewrite | OUTPUT_PARSER)
 
     rewritten_query = rewrite_chain.invoke({"user_input": state.user_query})
 
-    print("Node-7 Executed!")
+    logger.info("Node-7 Executed!")
 
     return {"rewritten_query": rewritten_query, "rewritten_flg": True}

@@ -1,5 +1,6 @@
 # Imports
 from src.state import *
+import logging
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from src.yt_video import node1_video_download, node2_transcription, node3_clean_up
@@ -9,8 +10,22 @@ from src.websearch import node8_web_search
 from src.responses import node9_generate_response, node10_get_user_input
 from src.routing_functions import vector_db_exists, retrieved_docs_relevant, graph_exit, acceptable_for_demo
 import sys
+import os
+
+ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
+
+if ENVIRONMENT == "local":
+    LOG_LEVEL = logging.DEBUG
+    handlers = logging.FileHandler('logs/yt_video_rag.log', encoding='utf-8', mode='w')
+else:
+    LOG_LEVEL = logging.INFO
+    handlers = logging.StreamHandler(sys.stdout)
+
+logging.basicConfig(level=LOG_LEVEL, format="%(asctime)s - %(levelname)s - %(message)s", handlers=[handlers])
+logger = logging.getLogger(__name__)
 
 def main():
+    logger.info("Starting the YouTube Q&A Application")
     # Instantiating the Graph
     graph = StateGraph(State)
 
@@ -67,11 +82,12 @@ def main():
             }
         )
     except Exception as e:
-        print(f"Error occurred:{e}\nExiting the application!")
+        logger.error(f"Error occurred:{e}\nExiting the application!")
         sys.exit(1)
 
+    logger.info("Invoking the application")
     result = app.invoke({}, config={"configurable": {"thread_id": thread_id}})
-
+    logger.info("Application finished execution")
 
 if __name__ == "__main__":
     main()

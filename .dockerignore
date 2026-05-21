@@ -4,3 +4,5 @@ venv/
 Jupyter Notebook/
 .gitignore
 __pycache__/
+logs/
+*.log
