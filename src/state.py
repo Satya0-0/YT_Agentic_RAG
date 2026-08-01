@@ -1,6 +1,7 @@
 from src.config import get_config
 from pydantic import BaseModel
 from typing import List, Optional
+from langchain_chroma import Chroma
 
 
 # Creating the State:
@@ -11,11 +12,12 @@ class State(BaseModel):
         arbitrary_types_allowed = True
 
     user_query: str = None
-    youtubeURL: str = None
-    local_path: str = get_config("path")
-    proceed_with_demo: bool = True
-    video_details: Optional[str] = None
-    transcription: str = ""
+    # youtubeURL: str = None
+    # local_path: str = 
+    # proceed_with_demo: bool = True
+    # video_details: Optional[str] = None
+    # transcription: str = ""
+    vector_store: Chroma = None
     vectorDB_flg: bool = False
     rewritten_query: Optional[str] = None
     rewritten_flg : bool = False

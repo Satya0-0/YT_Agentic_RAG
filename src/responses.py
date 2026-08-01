@@ -48,25 +48,25 @@ def node9_generate_response(state: State) -> dict:
 
 # Node-10: Placeholder Query. Used for "interrupt()"
 
-def node10_get_user_input(state: State) -> dict:
-    """Used for taking in new user input"""
+# def node10_get_user_input(state: State) -> dict:
+#     """Used for taking in new user input"""
 
-    # Taking in the New User Input
-    next_query = input("\n>>What's your next question (or type 'quit' to exit): ")
+#     # Taking in the New User Input
+#     next_query = input("\n>>What's your next question (or type 'quit' to exit): ")
 
-    # Check if the graph reached END during the last run
-    try:
-        exit_decision = True if next_query.lower() == "quit" else False
-    except Exception as e:
-        logger.error("\nError: ", e)
-        exit_decision = True
+#     # Check if the graph reached END during the last run
+#     try:
+#         exit_decision = True if next_query.lower() == "quit" else False
+#     except Exception as e:
+#         logger.error("\nError: ", e)
+#         exit_decision = True
 
-    logger.info("Node-10 Executed!")
-    logger.debug("All the variables initialized to their default values. Ready to receive new input!")
-    return {"graph_exit": exit_decision,
-            "user_query": next_query,
-            "rewritten_query": None,  # Reset for new query
-            "rewritten_flg": False,  # Reset flag
-            "documents": [],  # Clear old docs
-            "webResults": None  # Clear old web results
-            }
+#     logger.info("Node-10 Executed!")
+#     logger.debug("All the variables initialized to their default values. Ready to receive new input!")
+#     return {"graph_exit": exit_decision,
+#             "user_query": next_query,
+#             "rewritten_query": None,  # Reset for new query
+#             "rewritten_flg": False,  # Reset flag
+#             "documents": [],  # Clear old docs
+#             "webResults": None  # Clear old web results
+#             }
