@@ -3,8 +3,6 @@ from src.state import *
 import logging
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
-# from src.yt_video import node1_video_download, node2_transcription, node3_clean_up
-# from src.retrievals import node4_vectordb,
 from src.video_transcriber import step1_video_download, step2_InitiateVectorDB
 from src.retrievals import node5_retriever
 from src.query_optimizations import node6_llm_judge, node7_query_rewriter
@@ -36,7 +34,7 @@ def main():
     yt_url = input(">> Enter the YouTube URL for Q&A: ")
     logger.info("Downloading and trancribing the video.")
     transcription = step1_video_download(yt_url)
-    if transcription != False:
+    if transcription and transcription.strip() != "":
         local_vector_store = step2_InitiateVectorDB(transcription)
     else:
         logger.error("Issue with Video. Exiting the app!")
@@ -51,7 +49,6 @@ def main():
     graph.add_node("7_QueryRewriter", node7_query_rewriter)
     graph.add_node("8_WebSearch", node8_web_search)
     graph.add_node("9_GenerateResponse", node9_generate_response)
-    # graph.add_node("10_getUserInput", node10_get_user_input)
 
     # Adding Edges to the "graph" instance
 

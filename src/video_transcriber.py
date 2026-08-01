@@ -70,14 +70,13 @@ def step1_video_download(youtubeURL: str) -> bool:
             os.remove(temp_path)
             logger.info("Node3_CleanUp Executed. Video Deleted!")
         except Exception as e:
-            logger.error(f"Error occurred in file. Path not found: {e}")
+            logger.error(f"Error occurred in file. Video couldn't be deleted. Path not found: {e}")
         return trancription
-
 
 
 # Step-2: Creating a VectorDB Collection
 
-def step2_InitiateVectorDB(txt: str) -> None:
+def step2_InitiateVectorDB(transcription: str) -> None:
     """Creates the ChromaDB collection for the video transcription"""
 
     # Splitting the transcribed text
@@ -88,7 +87,7 @@ def step2_InitiateVectorDB(txt: str) -> None:
         is_separator_regex=get_config("text_splitter.is_separator_regex")
     )
 
-    docs = text_splitter.create_documents([txt])
+    docs = text_splitter.create_documents([transcription])
     sentence_transformer = get_sentence_transformer()
     vector_store = Chroma(
         collection_name = get_config("vectorDB_collection_name"),

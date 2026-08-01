@@ -12,11 +12,6 @@ class State(BaseModel):
         arbitrary_types_allowed = True
 
     user_query: str = None
-    # youtubeURL: str = None
-    # local_path: str = 
-    # proceed_with_demo: bool = True
-    # video_details: Optional[str] = None
-    # transcription: str = ""
     vector_store: Chroma = None
     vectorDB_flg: bool = False
     rewritten_query: Optional[str] = None
