@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 # Downloading YouTube Video, Transcribing it and deleting it
 
-def step1_video_download(youtubeURL: str) -> bool:
+async def step1_video_download(youtubeURL: str) -> bool:
     """ Downloads the YouTube video to the local path with a "clean" title"""
     
     # Used to store Transcription of the video
@@ -35,8 +35,8 @@ def step1_video_download(youtubeURL: str) -> bool:
         extension = info.get("ext")
         duration = info.get("duration")
 
-    if duration > 900:  # If video is longer than 15 minutes -> do not enter the LangGraph Loop
-        logger.error("Error! Video is too long for demo. \nCannot proceed!!")
+    if duration > 1800:  # If video is longer than 15 minutes -> do not enter the LangGraph Loop
+        logger.error("Error! Video is too long for demo, i.e., >20mins \nCannot proceed!!")
         return False
     
     else:
@@ -56,27 +56,26 @@ def step1_video_download(youtubeURL: str) -> bool:
 
         with YoutubeDL(yt_opts) as yt:
             yt.download([youtubeURL])
-  
+        logger.info("Step-1_Phase-1: Video_Download Executed!")
         # """Transcribes the YouTube video"""
-        transcription = get_transcription(temp_path)
+        transcription_obj = get_transcription(temp_path)
         
         # Final Text to be stored in Vector DB
-        trancription = transcription.text
+        transcription = transcription_obj.text
 
-        logger.info("Step-2 Executed! Video Transcribed Successfully!")
+        logger.info("Step-1_Phase-2: Video Transcribed Successfully!")
 
         # """Delete the transcribed YouTube video"""
         try:
             os.remove(temp_path)
-            logger.info("Node3_CleanUp Executed. Video Deleted!")
+            logger.info("Step-1_Phase-3: CleanUp Executed. Video Deleted!")
         except Exception as e:
             logger.error(f"Error occurred in file. Video couldn't be deleted. Path not found: {e}")
-        return trancription
+        return transcription
 
 
 # Step-2: Creating a VectorDB Collection
-
-def step2_InitiateVectorDB(transcription: str) -> None:
+async def step2_InitiateVectorDB(transcription: str) -> None:
     """Creates the ChromaDB collection for the video transcription"""
 
     # Splitting the transcribed text
@@ -100,6 +99,6 @@ def step2_InitiateVectorDB(transcription: str) -> None:
 
     vector_store.add_documents(documents=docs, ids=document_ids)
 
-    logger.info("Step-2 Executed! ChromaDB is ready.")
+    logger.info("Step-2: VectorDB Executed! ChromaDB is ready.")
 
     return vector_store

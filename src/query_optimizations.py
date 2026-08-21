@@ -11,9 +11,9 @@ OUTPUT_PARSER = StrOutputParser()
 logger = logging.getLogger(__name__)
 
 
-# Node-6: LLM Judge (determines the relevance of retrieved documents)
+# Node-2: LLM Judge (determines the relevance of retrieved documents)
 
-def node6_llm_judge(state: State) -> dict:
+async def node2_llm_judge(state: State) -> dict:
     """Acts as an LLM Judge to determine retrieved document relevance"""
     llm_judge = get_llm()
     global OUTPUT_PARSER
@@ -46,15 +46,15 @@ def node6_llm_judge(state: State) -> dict:
 
     judgement_result = judgement.lower() == "true"
 
-    logger.info("Node-6 Executed!")
+    logger.info("Node-2:LLM_Judge Executed!")
 
     return {"retrieval_sync": judgement_result}
 
 
 
-# Node-7: Conditional Node - Rewriting the query (depends on the State variable "retrieval_sync")
+# Node-3: Conditional Node - Rewriting the query (depends on the State variable "retrieval_sync")
 
-def node7_query_rewriter(state: State) -> dict:
+async def node3_query_rewriter(state: State) -> dict:
     """Rewrites the initial user query using another LLM for better retrievals"""
     llm_query_rewrite = get_llm()
     global OUTPUT_PARSER
@@ -78,6 +78,6 @@ def node7_query_rewriter(state: State) -> dict:
 
     rewritten_query = rewrite_chain.invoke({"user_input": state.user_query})
 
-    logger.info("Node-7 Executed!")
+    logger.info("Node-3:Query_Re-writter Executed!")
 
     return {"rewritten_query": rewritten_query, "rewritten_flg": True}

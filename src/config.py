@@ -10,7 +10,7 @@ video_path = Path(video_downloads).resolve()
 # Actual CONFIG dict
 CONFIG = {
     "model":{
-        "name":"gemini-2.5-flash-lite",
+        "name":"gemini-3.1-flash-lite",
         "temperature":0,
         "timeout":10,
         "max_retries":2
@@ -26,7 +26,7 @@ CONFIG = {
     },
     "text_splitter": {
         "chunk_size":800,
-        "overlap":100,
+        "overlap":200,
         "length":len,
         "is_separator_regex":False
     },

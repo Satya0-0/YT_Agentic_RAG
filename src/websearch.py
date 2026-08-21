@@ -4,9 +4,9 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Node-8: Conditional Node - Performs a Websearch if the re-written query also doesn't fetch the required docs
+# Node-4: Conditional Node - Performs a Websearch if the re-written query also doesn't fetch the required docs
 
-def node8_web_search(state: State) -> dict:
+async def node4_web_search(state: State) -> dict:
     """Used to perform a web search using DuckDuckGo for the given (rewritten) query"""
 
     if not state.rewritten_query:
@@ -17,7 +17,7 @@ def node8_web_search(state: State) -> dict:
     search = DuckDuckGoSearchRun()
     web_result = search.invoke(state.rewritten_query)
 
-    logger.info("Node-8 Executed!")
+    logger.info("Node-4: WebSearch Executed!")
     logger.debug(f"Search result: {web_result}")  # for Debugging
 
     return {"webResults": web_result}

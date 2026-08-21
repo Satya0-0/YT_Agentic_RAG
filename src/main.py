@@ -4,13 +4,14 @@ import logging
 from langgraph.graph import StateGraph, START, END
 from langgraph.checkpoint.memory import MemorySaver
 from src.video_transcriber import step1_video_download, step2_InitiateVectorDB
-from src.retrievals import node5_retriever
-from src.query_optimizations import node6_llm_judge, node7_query_rewriter
-from src.websearch import node8_web_search
-from src.responses import node9_generate_response #, node10_get_user_input
+from src.retrievals import node1_retriever
+from src.query_optimizations import node2_llm_judge, node3_query_rewriter
+from src.websearch import node4_web_search
+from src.responses import node5_generate_response
 from src.routing_functions import vector_db_exists, retrieved_docs_relevant, graph_exit, acceptable_for_demo
 import sys
 import os
+import asyncio
 
 # Handling Logging
 ENVIRONMENT = os.getenv("ENVIRONMENT", "local")
@@ -27,15 +28,15 @@ logger = logging.getLogger(__name__)
 
 
 # Defning the main function
-def main():
+async def main():
     logger.info("Starting the YouTube Q&A Application")
     
     # Taking in YT Video URL
     yt_url = input(">> Enter the YouTube URL for Q&A: ")
     logger.info("Downloading and trancribing the video.")
-    transcription = step1_video_download(yt_url)
+    transcription = await step1_video_download(yt_url)
     if transcription and transcription.strip() != "":
-        local_vector_store = step2_InitiateVectorDB(transcription)
+        local_vector_store = await step2_InitiateVectorDB(transcription)
     else:
         logger.error("Issue with Video. Exiting the app!")
         sys.exit(1)
@@ -44,20 +45,20 @@ def main():
     graph = StateGraph(State)
 
     # Adding nodes
-    graph.add_node("5_Retriever", node5_retriever)
-    graph.add_node("6_llmJudge", node6_llm_judge)
-    graph.add_node("7_QueryRewriter", node7_query_rewriter)
-    graph.add_node("8_WebSearch", node8_web_search)
-    graph.add_node("9_GenerateResponse", node9_generate_response)
+    graph.add_node("1_Retriever", node1_retriever)
+    graph.add_node("2_llmJudge", node2_llm_judge)
+    graph.add_node("3_QueryRewriter", node3_query_rewriter)
+    graph.add_node("4_WebSearch", node4_web_search)
+    graph.add_node("5_GenerateResponse", node5_generate_response)
 
     # Adding Edges to the "graph" instance
 
-    graph.add_edge(START, "5_Retriever")
-    graph.add_edge("5_Retriever", "6_llmJudge")
-    graph.add_conditional_edges("6_llmJudge", retrieved_docs_relevant, {"Response": "9_GenerateResponse", "Rewrite": "7_QueryRewriter", "webSearch": "8_WebSearch"})
-    graph.add_edge("7_QueryRewriter", "5_Retriever")
-    graph.add_edge("8_WebSearch", "9_GenerateResponse")
-    graph.add_edge("9_GenerateResponse", END)
+    graph.add_edge(START, "1_Retriever")
+    graph.add_edge("1_Retriever", "2_llmJudge")
+    graph.add_conditional_edges("2_llmJudge", retrieved_docs_relevant, {"Response": "5_GenerateResponse", "Rewrite": "3_QueryRewriter", "webSearch": "4_WebSearch"})
+    graph.add_edge("3_QueryRewriter", "1_Retriever")
+    graph.add_edge("4_WebSearch", "5_GenerateResponse")
+    graph.add_edge("5_GenerateResponse", END)
 
     # Compling the Graph
     # Using a memory saver so the state persists between runs
@@ -65,31 +66,52 @@ def main():
 
     # A unique ID for the conversation
     thread_id = "chat-1"
+    
+    
+    # Loop control vairable 
+    enter_loop = True
 
-    # Taking in user queries
-    user_query = input(">> Enter your query: ")
-
-    # Starting the Graph with Initial User Query
-    try:
-        app.update_state(
-            config={
-                "configurable": {
-                    "thread_id": thread_id,
-                    "recursion_limit": 100,
-                    "vector_store": local_vector_store
+    while(enter_loop):
+        # Taking in user queries
+        user_query = input("\n>> Enter your query: ")
+        print("\n")
+    
+        # Starting the Graph with Provided User Query
+        try:
+            await app.aupdate_state(
+                config={
+                    "configurable": {
+                        "thread_id": thread_id,
+                        "recursion_limit": 100,
+                        "vector_store": local_vector_store
+                    }
+                },
+                values={
+                    "user_query": user_query
                 }
-            },
-            values={
-                "user_query": user_query
-            }
-        )
-    except Exception as e:
-        logger.error(f"Error occurred:{e}\nExiting the application!")
-        sys.exit(1)
+            )
+        except Exception as e:
+            logger.error(f"Error occurred:{e}\nExiting the application!")
+            sys.exit(1)
 
-    logger.info("Invoking the application")
-    result = app.invoke({}, config={"configurable": {"thread_id": thread_id, "vector_store": local_vector_store}})
+        logger.info("Invoking the application")
+        result = await app.ainvoke({}, config={"configurable": {"thread_id": thread_id, "vector_store": local_vector_store}})
+
+        print(f"\nGenerated response: {result["graph_output"]}\n")
+
+        # Taking user input to decide if they want to continue or not
+        user_choice_quit = input("\nDo you have further queries? (Yes/No): ")
+
+        if user_choice_quit.strip().upper() =="YES" or user_choice_quit.strip().upper() == "Y":
+            enter_loop = True
+        elif user_choice_quit.strip().upper() =="NO" or user_choice_quit.strip().upper() == "N":
+            enter_loop = False
+        else:
+            enter_loop = False
+            print("Response Unrecognized. Exiting the app!")
+            logger.info("User entered invalid input on Loop_Continue decision. Exited the loop!")
+
     logger.info("Application finished execution")
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
